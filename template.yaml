@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  person-crud
+  Sample SAM Template for person-crud
+
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.App::handleRequest
+      Runtime: java17
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          PARAM1: VALUE
+      Role: !GetAtt HelloWorldFunctionRole.Arn  # Role is correctly set here
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /hello
+            Method: GET
+        GetPersons:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /person
+            Method: GET
+        CreatePerson:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /person
+            Method: POST
+        GetPersonById:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /person/{id}
+            Method: GET
+        UpdatePerson:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /person/{id}
+            Method: PUT
+        DeletePerson:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /person/{id}
+            Method: DELETE
+
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "PersonCRUDApi"
+      Description: "API for person CRUD operations"
+      FailOnWarnings: true
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - HelloWorldFunctionHelloWorldPermissionStage
+      - HelloWorldFunctionGetPersonsPermissionStage
+      - HelloWorldFunctionCreatePersonPermissionStage
+      - HelloWorldFunctionGetPersonByIdPermissionStage
+      - HelloWorldFunctionUpdatePersonPermissionStage
+      - HelloWorldFunctionDeletePersonPermissionStage
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: Prod
+      Description: "Deployment for CRUD API"
+
+  HelloWorldFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: LambdaAPIGatewayPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:*"
+                  - "apigateway:*"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt HelloWorldFunction.Arn
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn

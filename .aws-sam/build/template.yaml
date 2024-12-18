@@ -1,12 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'person-crud Sample SAM Template for person-crud
+Description: 'sam-app
+
+  Sample SAM Template for sam-app
 
   '
 Globals:
   Function:
     Timeout: 20
     MemorySize: 512
+    Environment:
+      Variables:
+        DB_URL: jdbc:postgresql://dpg-crppk7jv2p9s7389nrhg-a.oregon-postgres.render.com/mailsender_dox0
+        DB_USERNAME: mailsender_dox0_user
+        DB_PASSWORD: iiDOG6vsQKsOBcwSc0FxIuFXkMfDq9oh
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
@@ -16,114 +23,51 @@ Resources:
       Runtime: java17
       Architectures:
       - x86_64
-      MemorySize: 512
       Environment:
         Variables:
           PARAM1: VALUE
-      Role:
-        Fn::GetAtt:
-        - HelloWorldFunctionRole
-        - Arn
       Events:
         HelloWorld:
           Type: Api
           Properties:
-            RestApiId:
-              Ref: ApiGateway
-            Path: /hello
-            Method: GET
-        GetPersons:
+            Path: /hi
+            Method: get
+        Create1Person:
           Type: Api
           Properties:
-            RestApiId:
-              Ref: ApiGateway
             Path: /person
-            Method: GET
-        CreatePerson:
+            Method: post
+        ShowAllPersons:
           Type: Api
           Properties:
-            RestApiId:
-              Ref: ApiGateway
-            Path: /person
-            Method: POST
-        GetPersonById:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ApiGateway
-            Path: /person/{id}
-            Method: GET
+            Path: /showAllPersons
+            Method: get
         UpdatePerson:
           Type: Api
           Properties:
-            RestApiId:
-              Ref: ApiGateway
-            Path: /person/{id}
-            Method: PUT
-        DeletePerson:
+            Path: /person/{person_id}
+            Method: put
+        Delete1Persons:
           Type: Api
           Properties:
-            RestApiId:
-              Ref: ApiGateway
-            Path: /person/{id}
-            Method: DELETE
+            Path: /person/{person_id}
+            Method: delete
     Metadata:
       SamResourceId: HelloWorldFunction
-  ApiGateway:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: PersonCRUDApi
-      Description: API for person CRUD operations
-      FailOnWarnings: true
-  ApiGatewayDeployment:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-    - HelloWorldFunctionHelloWorldPermissionStage
-    - HelloWorldFunctionGetPersonsPermissionStage
-    - HelloWorldFunctionCreatePersonPermissionStage
-    - HelloWorldFunctionGetPersonByIdPermissionStage
-    - HelloWorldFunctionUpdatePersonPermissionStage
-    - HelloWorldFunctionDeletePersonPermissionStage
-    Properties:
-      RestApiId:
-        Ref: ApiGateway
-      StageName: Prod
-      Description: Deployment for CRUD API
-  HelloWorldFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: lambda.amazonaws.com
-          Action: sts:AssumeRole
-      Policies:
-      - PolicyName: LambdaAPIGatewayPolicy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - logs:*
-            - apigateway:*
-            Resource: '*'
-          - Effect: Allow
-            Action:
-            - lambda:InvokeFunction
-            Resource:
-              Fn::GetAtt:
-              - HelloWorldFunction
-              - Arn
 Outputs:
   HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
     Value:
-      Fn::Sub: https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
   HelloWorldFunction:
     Description: Hello World Lambda Function ARN
     Value:
       Fn::GetAtt:
       - HelloWorldFunction
+      - Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunctionRole
       - Arn

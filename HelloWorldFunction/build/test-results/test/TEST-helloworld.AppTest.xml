@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="helloworld.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-06T09:45:54" hostname="DESKTOP-VKF2EI6" time="0.775">
+<testsuite name="helloworld.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-18T10:57:15" hostname="DESKTOP-VKF2EI6" time="1.197">
   <properties/>
-  <testcase name="successfulResponse" classname="helloworld.AppTest" time="0.775"/>
-  <system-out><![CDATA[]]></system-out>
+  <testcase name="successfulResponse" classname="helloworld.AppTest" time="1.197"/>
+  <system-out><![CDATA[Response Body: { "message": "hello world", "location": "223.233.66.250" }
+]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

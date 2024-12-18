@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "person-crud"
+stack_name = "sam-app"
 
 [default.build.parameters]
 cached = true
@@ -16,7 +16,7 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
-s3_prefix = "person-crud"
+s3_prefix = "sam-app"
 region = "us-west-2"
 image_repositories = []
 
